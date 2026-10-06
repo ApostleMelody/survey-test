@@ -160,7 +160,7 @@ textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(31,110,108,.1)
 .done-badge svg{width:38px;height:38px;stroke:#fff}
 .done h2{font-family:var(--serif);font-size:26px;margin-bottom:10px}
 .done p{color:var(--muted);max-width:420px;margin:0 auto;font-size:15px}
-.done-cta{display:inline-block;margin-top:26px;background:var(--orange);color:#fff;padding:14px 30px;border-radius:13px;text-decoration:none;font-weight:700;box-shadow:0 8px 20px rgba(244,118,43,.3)}
+.done-cta{display:inline-block;margin-top:26px;background:var(--orange);color:#fff;padding:14px 30px;border-radius:13px;text-decoration:none;font-weight:700;box-shadow:0 8px 20px rgba(244,118,43,.3);border:none;cursor:pointer;font-family:var(--sans);font-size:15px}
 .done-cta:hover{background:var(--orange-deep)}
 .done-steps{margin:26px auto 0;max-width:430px;display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left}
 .done-step{background:#F6F1E6;border:1px solid var(--line);border-radius:13px;padding:14px}
@@ -235,7 +235,7 @@ textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(31,110,108,.1)
       </div>
       <h2>谢谢你，让这里多了一个好声音</h2>
       <p>我们已经收到你的想法。它会被整理、被看见，并进入下一步的讨论清单。</p>
-      <a class="done-cta" href="#top">再看看问卷</a>
+      <button class="done-cta" onclick="restartSurvey()">再看看问卷</button>
       <div class="done-steps">
         <div class="done-step"><b>接下来会发生什么</b><span>汇总 → 评审 → 反馈</span></div>
         <div class="done-step"><b>多久有反馈</b><span>一般两周内，悄悄告诉你进展</span></div>
@@ -406,6 +406,15 @@ async function doSubmit(){
 function finish(){
   document.getElementById('survey').classList.remove('active');
   document.getElementById('done').classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function restartSurvey(){
+  answers.length = 0;
+  QUESTIONS.forEach(()=>answers.push({}));
+  step = 0;
+  document.getElementById('done').classList.remove('active');
+  document.getElementById('survey').classList.add('active');
+  showStep();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
