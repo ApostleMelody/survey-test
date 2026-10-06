@@ -116,6 +116,29 @@ export async function onRequest(context) {
     return json({ ok: true, total: subs.length, results: subs });
   }
 
+  // ---------- 清空全部结果（需登录令牌）----------
+  if (path === '/api/clear' && request.method === 'POST') {
+    const auth = (request.headers.get('Authorization') || url.searchParams.get('token') || '').replace('Bearer ', '').trim();
+    if (!auth) return json({ ok: false, error: '未登录' }, 401);
+    const valid = await env.SURVEY_KV.get('token:' + auth);
+    if (valid !== '1') return json({ ok: false, error: '会话已失效，请重新登录' }, 401);
+
+    // 删除所有 sub:* 开头的键（每一份提交）
+    let cursor;
+    do {
+      const page = await env.SURVEY_KV.list({ prefix: 'sub:', cursor });
+      for (const k of page.keys) {
+        await env.SURVEY_KV.delete(k.name);
+      }
+      cursor = page.cursor;
+    } while (cursor);
+
+    // 删除索引（记账本）
+    await env.SURVEY_KV.delete('index:subs');
+
+    return json({ ok: true, cleared: true });
+  }
+
   return json({ ok: false, error: '接口不存在' }, 404);
 }
 //（注：内容由AI生成）

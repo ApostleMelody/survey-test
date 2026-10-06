@@ -207,12 +207,12 @@ textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(31,110,108,.1)
   <section class="hero">
     <span class="badge">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
-      已开启匿名
+      可匿名 · 可署名
     </span>
     <h1 class="title">你的想法，<span class="hl">值得被听见</span></h1>
-    <p class="sub">花 3 分钟，把那些「早就想说」的点子告诉我们。没有标准答案，只有真实的你。</p>
+    <p class="sub">花 3 分钟，把那些「早就想说」的点子告诉我们。可以匿名，也可以留下名字——随你。</p>
     <div class="chips">
-      <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>全程匿名</span>
+      <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>匿名 / 署名可选</span>
       <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></span>约 3 分钟</span>
       <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20s-7-5-7-11a4 4 0 018-1.5A4 4 0 0119 9c0 6-7 11-7 11z"/></svg>真诚可贵</span>
     </div>
@@ -264,7 +264,10 @@ textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(31,110,108,.1)
           <button class="m-btn orange" onclick="exportCsv()">下载 CSV</button>
           <button class="m-btn" onclick="exportJson()">下载 JSON</button>
         </div>
-        <div class="m-actions" style="margin-top:10px"><button class="m-btn ghost" onclick="closeAdmin()">关闭</button></div>
+        <div class="m-actions" style="margin-top:10px">
+          <button class="m-btn ghost" onclick="closeAdmin()">关闭</button>
+          <button class="m-btn" style="background:#C0392B" onclick="clearResults()">清空全部结果</button>
+        </div>
       </div>
     </div>
   </div>
@@ -355,6 +358,13 @@ const QUESTIONS = [
   }
 ];
 
+/* ===== 署名题：自动加在最前面，用户可选匿名或填姓名/昵称 ===== */
+QUESTIONS.unshift({
+  id:'sign0', type:'sign', tag:'署名',
+  title:'你希望这份问卷怎么「署名」？',
+  sub:'可以匿名，也可以留下姓名或昵称。选"填写姓名或昵称"时，结果里会显示你的名字。'
+});
+
 let step = 0;
 const answers = QUESTIONS.map(()=>({}));
 
@@ -381,6 +391,9 @@ function collectAnswers(){
       ans=a.sel!==undefined?String(a.sel):'';
     }else if(q.type==='open'){
       ans=a.text||'';
+    }else if(q.type==='sign'){
+      if(a.sel==='name') ans='署名：'+(a.name||'未填写');
+      else if(a.sel==='anon') ans='匿名';
     }
     return {title:q.title, answer:ans};
   });
@@ -461,6 +474,26 @@ async function exportJson(){
   const a=document.createElement('a'); a.href=url; a.download='问卷结果.json'; a.click();
   URL.revokeObjectURL(url);
 }
+async function clearResults(){
+  if(!confirm('确定要清空全部已提交的结果吗？此操作不可恢复！')){
+    return;
+  }
+  if(!confirm('再次确认：所有答卷都会被删除，确定继续？')){
+    return;
+  }
+  try{
+    const res=await fetch(API_BASE+'/clear',{method:'POST',headers:{'Authorization':'Bearer '+adminToken}});
+    const data=await res.json();
+    if(data.ok){
+      alert('已清空全部结果。');
+      document.getElementById('adminCount').textContent='0';
+    }else{
+      alert('清空失败：'+(data.error||'未知错误'));
+    }
+  }catch(e){
+    alert('清空失败：网络错误');
+  }
+}
 
 function num(step){return String(step+1).padStart(2,'0');}
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
@@ -503,6 +536,20 @@ function renderQuestion(q){
     inner = `<textarea data-open placeholder="${esc(q.placeholder)}">${esc(a.text||'')}</textarea>
       <div class="field-tip">写多少都可以，一句真话胜过十句客套。</div>
       <div class="count"><span class="cnt">${(a.text||'').length}</span> 字</div>`;
+  }
+  if(q.type==='sign'){
+    inner = `
+      <div class="opt ${a.sel==='anon'?'sel':''}" data-key="anon">
+        <span class="radio"></span><span class="txt">匿名提交</span>
+      </div>
+      <div class="opt ${a.sel==='name'?'sel':''}" data-key="name">
+        <span class="radio"></span>
+        <span class="txt">填写姓名或昵称<span class="other-cue">（会显示在结果里）</span></span>
+      </div>
+      <div class="other ${a.sel==='name'?'open':''}">
+        <label>你的姓名或昵称：</label>
+        <input type="text" data-name placeholder="输入姓名或昵称" value="${esc(a.name||'')}">
+      </div>`;
   }
   return inner;
 }
@@ -553,7 +600,7 @@ function bindCard(){
   card.querySelectorAll('.opt').forEach(el=>{
     el.addEventListener('click',()=>{
       const key = el.dataset.key;
-      if(q.type==='single'){
+      if(q.type==='single' || q.type==='sign'){
         a.sel = key;
         a.text = (key==='other') ? (a.otherText||'') : undefined;
         renderAll();
@@ -575,6 +622,10 @@ function bindCard(){
   // 其他填写
   card.querySelectorAll('[data-other]').forEach(inp=>{
     inp.addEventListener('input',()=>{ a.otherText=inp.value; updateProgress(); });
+  });
+  // 署名题的姓名输入
+  card.querySelectorAll('[data-name]').forEach(inp=>{
+    inp.addEventListener('input',()=>{ a.name=inp.value; updateProgress(); });
   });
   // 评分
   card.querySelectorAll('.r-btn').forEach(el=>{
