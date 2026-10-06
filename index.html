@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>想法共创 · 员工意见征集</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231F6E6C'/><path d='M50 22c-13 0-22 9-22 20 0 8 4 13 8 17v4c0 3 2 5 5 5h18c3 0 5-2 5-5v-4c4-4 8-9 8-17 0-11-9-20-22-20z' fill='%23FBF7F0'/><circle cx='50' cy='78' r='4' fill='%23F4762B'/><rect x='46' y='55' width='8' height='14' rx='4' fill='%23F4762B'/></svg>">
+<style>
+:root{
+  --paper:#F6F1E6; --card:#FFFDF8; --ink:#26333A; --muted:#7C8A8F;
+  --teal:#1F6E6C; --teal-deep:#15524F; --orange:#F4762B; --orange-deep:#D85E17;
+  --gold:#F2C14E; --line:#E7DED0; --soft:#FFF4E2; --ok:#2E9E6B;
+  --serif:"Noto Serif SC",serif; --sans:"Noto Sans SC",sans-serif;
+  --r:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);color:var(--ink);line-height:1.7;
+  background:
+    radial-gradient(1200px 600px at 85% -10%, #FBEFD9 0%, transparent 60%),
+    radial-gradient(900px 500px at -10% 20%, #E4F1EE 0%, transparent 55%),
+    var(--paper);
+  min-height:100vh;
+}
+.wrap{max-width:720px;margin:0 auto;padding:0 20px 64px}
+
+/* ---------- 开场 Hero ---------- */
+.hero{padding:56px 0 20px;text-align:center}
+.badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--soft);border:1px solid #F4D8A8;color:var(--orange-deep);
+  font-size:13px;font-weight:600;padding:6px 14px;border-radius:999px;
+}
+.badge svg{width:14px;height:14px}
+h1.title{
+  font-family:var(--serif);font-weight:800;font-size:34px;line-height:1.25;margin:18px 0 6px;
+  letter-spacing:.5px;
+}
+h1.title .hl{position:relative;color:var(--teal-deep)}
+h1.title .hl::after{
+  content:"";position:absolute;left:0;right:0;bottom:2px;height:12px;
+  background:linear-gradient(90deg,transparent,rgba(244,118,43,.32) 30%,rgba(244,118,43,.32) 70%,transparent);
+  z-index:-1;border-radius:4px;
+}
+.hero p.sub{color:var(--muted);font-size:15px;max-width:520px;margin:10px auto 0}
+.chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:20px 0 6px}
+.chip{font-size:12.5px;color:var(--teal-deep);background:#E7F2F0;border:1px solid #C4E0DC;border-radius:999px;padding:5px 12px;display:inline-flex;align-items:center;gap:6px}
+.chip svg{width:13px;height:13px}
+.cta{
+  margin-top:26px;background:var(--orange);color:#fff;border:none;cursor:pointer;
+  font-size:16px;font-weight:700;font-family:var(--sans);
+  padding:15px 34px;border-radius:14px;box-shadow:0 8px 20px rgba(244,118,43,.32);
+  transition:transform .15s, box-shadow .2s, background .2s;
+}
+.cta:hover{transform:translateY(-2px);background:var(--orange-deep);box-shadow:0 12px 26px rgba(244,118,43,.4)}
+.hero-note{font-size:12px;color:#A8A89B;margin-top:14px}
+
+/* ---------- 问卷面板 ---------- */
+.panel{display:none;margin-top:28px}
+.panel.active{display:block;animation:rise .45s ease}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+/* 进度条 */
+.progress-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:13px;color:var(--muted)}
+.progress-head b{color:var(--ink)}
+.bar{height:8px;background:#EAE3D6;border-radius:99px;overflow:hidden;margin-bottom:26px}
+.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--orange));border-radius:99px;transition:width .5s cubic-bezier(.3,.8,.4,1)}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:30px 30px 26px;box-shadow:0 6px 18px rgba(70,52,30,.05)}
+.q-head{display:flex;gap:14px;align-items:flex-start}
+.q-num{
+  flex:none;width:34px;height:34px;border-radius:11px;background:var(--teal);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;margin-top:2px;
+}
+.q-title{font-size:19px;font-weight:700;font-family:var(--serif);line-height:1.5}
+.q-sub{font-size:13px;color:var(--muted);margin-top:4px}
+.q-tag{display:inline-block;font-size:11px;color:var(--orange-deep);background:var(--soft);border:1px solid #F2D9AF;border-radius:99px;padding:2px 9px;margin-left:8px;vertical-align:middle}
+
+.q-body{margin-top:22px}
+
+/* 选项 */
+.opt{
+  display:flex;align-items:center;gap:12px;padding:15px 16px;margin-bottom:10px;
+  border:1.5px solid var(--line);border-radius:13px;cursor:pointer;transition:all .18s;background:#fff;
+  user-select:none;
+}
+.opt:hover{border-color:#CBBFA8;background:#FDFAF3}
+.opt.sel{border-color:var(--teal);background:#EEF6F5;box-shadow:0 0 0 3px rgba(31,110,108,.08)}
+.opt .radio{
+  flex:none;width:20px;height:20px;border-radius:50%;border:2px solid #C4BFAE;position:relative;transition:all .18s;
+}
+.opt.sel .radio{border-color:var(--teal)}
+.opt.sel .radio::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--teal)}
+.opt.sel .check{background:var(--teal);border-color:var(--teal)}
+.opt.sel .check svg{opacity:1}
+.check{
+  flex:none;width:20px;height:20px;border-radius:5px;border:2px solid #C4BFAE;display:flex;align-items:center;justify-content:center;
+}
+.check svg{width:12px;height:12px;opacity:0;transition:opacity .15s}
+.opt .txt{flex:1;font-size:15px}
+.opt .other-cue{font-size:11px;color:var(--orange-deep)}
+
+/* “其他”填写框 */
+.other{display:none;margin:-2px 0 12px 42px;animation:slide .3s ease}
+.other.open{display:block}
+@keyframes slide{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.other input{
+  width:100%;border:1.5px solid var(--orange);border-radius:11px;padding:12px 14px;font-size:15px;
+  background:#FFFBEF;color:var(--ink);outline:none;font-family:var(--sans);
+}
+.other input:focus{box-shadow:0 0 0 3px rgba(244,118,43,.15)}
+.other label{display:block;font-size:12px;color:var(--orange-deep);margin-bottom:6px}
+
+/* 评分 */
+.rating{display:flex;gap:8px;flex-wrap:wrap}
+.r-item{flex:1;min-width:88px;text-align:center}
+.r-btn{
+  width:100%;padding:16px 0;border:1.5px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;
+  font-size:20px;font-weight:700;color:var(--muted);transition:all .16s;font-family:var(--sans);
+}
+.r-btn:hover{border-color:#CBBFA8}
+.r-btn.sel{background:var(--teal);border-color:var(--teal);color:#fff;box-shadow:0 6px 16px rgba(31,110,108,.25)}
+.r-label{font-size:11.5px;color:var(--muted);margin-top:6px}
+.r-label.hot{color:var(--orange-deep);font-weight:600}
+
+/* 开放题 */
+textarea{
+  width:100%;border:1.5px solid var(--line);border-radius:13px;padding:16px;font-size:15px;line-height:1.8;
+  min-height:150px;resize:vertical;outline:none;background:#fff;font-family:var(--sans);color:var(--ink);
+}
+textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(31,110,108,.1)}
+.field-tip{font-size:12px;color:var(--muted);margin-top:8px}
+.count{text-align:right;font-size:12px;color:#A8A89B;margin-top:6px}
+
+/* 导航按钮 */
+.nav{display:flex;justify-content:space-between;margin-top:26px;gap:12px}
+.skip{
+  background:transparent;border:1px dashed #C9BFAB;color:var(--muted);cursor:pointer;
+  font-family:var(--sans);font-size:13px;font-weight:600;padding:8px 14px;border-radius:10px;transition:all .15s;
+}
+.skip:hover{border-color:var(--teal);color:var(--teal);background:#EFF6F5}
+.skiped{opacity:.6;text-decoration:line-through}
+.btn{
+  border:none;cursor:pointer;font-family:var(--sans);font-size:15px;font-weight:600;padding:13px 24px;border-radius:13px;transition:all .18s;
+}
+.btn.prev{background:#EFE9DD;color:var(--ink)}
+.btn.prev:hover{background:#E7DFCE}
+.btn.next{background:var(--teal);color:#fff;flex:1}
+.btn.next:hover{background:var(--teal-deep)}
+.btn.next:disabled{opacity:.45;cursor:not-allowed}
+.btn.fin{background:var(--orange);color:#fff;flex:1}
+.btn.fin:hover{background:var(--orange-deep)}
+
+/* ---------- 完成页 ---------- */
+.done{display:none;margin-top:28px}
+.done.active{display:block;animation:rise .5s ease}
+.done-card{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:48px 40px;text-align:center;box-shadow:0 10px 30px rgba(70,52,30,.06)}
+.done-badge{width:76px;height:76px;border-radius:22px;margin:0 auto 22px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--teal),#2E9E9B);box-shadow:0 10px 24px rgba(31,110,108,.3)}
+.done-badge svg{width:38px;height:38px;stroke:#fff}
+.done h2{font-family:var(--serif);font-size:26px;margin-bottom:10px}
+.done p{color:var(--muted);max-width:420px;margin:0 auto;font-size:15px}
+.done-cta{display:inline-block;margin-top:26px;background:var(--orange);color:#fff;padding:14px 30px;border-radius:13px;text-decoration:none;font-weight:700;box-shadow:0 8px 20px rgba(244,118,43,.3)}
+.done-cta:hover{background:var(--orange-deep)}
+.done-steps{margin:26px auto 0;max-width:430px;display:grid;grid-template-columns:1fr 1fr;gap:12px;text-align:left}
+.done-step{background:#F6F1E6;border:1px solid var(--line);border-radius:13px;padding:14px}
+.done-step b{display:block;color:var(--teal-deep);font-size:13px;margin-bottom:4px}
+.done-step span{font-size:12.5px;color:var(--muted)}
+
+/* ---------- 管理端弹窗 ---------- */
+.admin-entry{position:fixed;right:18px;bottom:16px;font-size:12px;color:#B0AA98;background:transparent;border:none;cursor:pointer;font-family:var(--sans)}
+.admin-entry:hover{color:var(--teal)}
+.modal{display:none;position:fixed;inset:0;background:rgba(38,51,58,.4);z-index:50;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.modal-box{background:var(--card);border:1px solid var(--line);border-radius:20px;width:100%;max-width:400px;padding:28px;box-shadow:0 20px 50px rgba(20,30,35,.25)}
+.modal-box h3{font-family:var(--serif);font-size:20px;margin-bottom:6px}
+.modal-box .m-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.modal-box input[type=password]{width:100%;border:1.5px solid var(--line);border-radius:11px;padding:12px 14px;font-size:15px;outline:none;font-family:var(--sans);margin-bottom:12px}
+.modal-box input[type=password]:focus{border-color:var(--teal)}
+.m-err{font-size:12px;color:#C0392B;min-height:16px;margin-bottom:8px}
+.m-actions{display:flex;gap:10px}
+.m-btn{flex:1;border:none;border-radius:11px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--sans);background:var(--teal);color:#fff}
+.m-btn:hover{background:var(--teal-deep)}
+.m-btn.orange{background:var(--orange)}
+.m-btn.orange:hover{background:var(--orange-deep)}
+.m-btn.ghost{background:#EFE9DD;color:var(--ink)}
+.m-close{float:right;background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;line-height:1}
+.admin-count{display:flex;align-items:baseline;gap:8px;margin-bottom:18px;padding:14px;background:#EEF6F5;border:1px solid #C4E0DC;border-radius:13px}
+.admin-count b{font-size:26px;color:var(--teal-deep);font-family:var(--serif)}
+.admin-count span{font-size:13px;color:var(--teal-deep)}
+
+.foot{text-align:center;font-size:12px;color:#A8A89B;margin-top:40px}
+
+@media(max-width:520px){
+  .hero{padding:40px 0 8px}
+  h1.title{font-size:27px}
+  .card{padding:22px 18px}
+  .q-title{font-size:17px}
+  .opt{padding:13px 12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== 开场 ===== -->
+  <section class="hero">
+    <span class="badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+      已开启匿名
+    </span>
+    <h1 class="title">你的想法，<span class="hl">值得被听见</span></h1>
+    <p class="sub">花 3 分钟，把那些「早就想说」的点子告诉我们。没有标准答案，只有真实的你。</p>
+    <div class="chips">
+      <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>全程匿名</span>
+      <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></span>约 3 分钟</span>
+      <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20s-7-5-7-11a4 4 0 018-1.5A4 4 0 0119 9c0 6-7 11-7 11z"/></svg>真诚可贵</span>
+    </div>
+    <button class="cta" id="startBtn">开始填写</button>
+    <p class="hero-note">· 你的每一句话都会被认真对待 ·</p>
+  </section>
+
+  <!-- ===== 问卷 ===== -->
+  <section class="panel" id="survey">
+    <div class="progress-head"><span>已答 <b id="doneCnt">0</b> / <span id="totalCnt">6</span></span><span id="pctTxt">0%</span></div>
+    <div class="bar"><i id="barFill"></i></div>
+    <div id="qContainer"></div>
+  </section>
+
+  <!-- ===== 完成 ===== -->
+  <section class="done" id="done">
+    <div class="done-card">
+      <div class="done-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <h2>谢谢你，让这里多了一个好声音</h2>
+      <p>我们已经收到你的想法。它会被整理、被看见，并进入下一步的讨论清单。</p>
+      <a class="done-cta" href="#top">再看看问卷</a>
+      <div class="done-steps">
+        <div class="done-step"><b>接下来会发生什么</b><span>汇总 → 评审 → 反馈</span></div>
+        <div class="done-step"><b>多久有反馈</b><span>一般两周内，悄悄告诉你进展</span></div>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot">想法共创 · 员工意见征集</p>
+
+  <!-- ===== 管理端入口 ===== -->
+  <button class="admin-entry" onclick="openAdmin()">管理入口 · 需登录</button>
+  <div class="modal" id="adminModal">
+    <div class="modal-box">
+      <button class="m-close" onclick="closeAdmin()">×</button>
+      <div id="adminLogin">
+        <h3>管理员登录</h3>
+        <p class="m-sub">输入部署时设置的管理密码</p>
+        <input type="password" id="adminPw" placeholder="管理密码" onkeydown="if(event.key==='Enter')adminLogin()">
+        <div class="m-err" id="adminErr"></div>
+        <div class="m-actions"><button class="m-btn" onclick="adminLogin()">登录</button></div>
+      </div>
+      <div id="adminPanel" style="display:none">
+        <h3>结果管理</h3>
+        <div class="admin-count"><b id="adminCount">…</b><span>份有效提交</span></div>
+        <div class="m-actions">
+          <button class="m-btn orange" onclick="exportCsv()">下载 CSV</button>
+          <button class="m-btn" onclick="exportJson()">下载 JSON</button>
+        </div>
+        <div class="m-actions" style="margin-top:10px"><button class="m-btn ghost" onclick="closeAdmin()">关闭</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== JS：数据与渲染 ===== -->
+<script>
+const QUESTIONS = [
+  {
+    "type": "single",
+    "title": "你更希望用哪种方式，参与下一次「想法共创」？",
+    "sub": "选一个，如果都不太对，选「其他」并写下来。",
+    "tag": "单选",
+    "options": [
+      "专题工作坊（线下一起聊）",
+      "匿名建议箱（随时投递）",
+      "线上脑暴会（灵活参与）",
+      "部门小范围讨论"
+    ],
+    "hasOther": true,
+    "otherPlaceholder": "比如：我喜欢一种你没列出来的方式……"
+  },
+  {
+    "type": "rating",
+    "title": "你觉得团队目前对「新想法」的包容度如何？",
+    "sub": "1 = 很少被鼓励，5 = 大家很愿意听。",
+    "tag": "评分",
+    "scale": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "labels": {
+      "min": "1 · 不敢提",
+      "mid": "3 · 一般",
+      "max": "5 · 很包容"
+    }
+  },
+  {
+    "type": "multi",
+    "title": "你最希望公司优先改进哪些方面？",
+    "sub": "可以多选，最多选 3 个；也可以补充你自己的答案。",
+    "tag": "多选",
+    "options": [
+      "沟通与协作机制",
+      "成长与发展机会",
+      "薪酬与福利",
+      "工作环境与氛围",
+      "工具与流程效率"
+    ],
+    "hasOther": true,
+    "otherPlaceholder": "我还有个别的想法：……",
+    "max": 3
+  },
+  {
+    "type": "open",
+    "title": "最近你最想提的那「一个」好点子，是什么？",
+    "sub": "哪怕不成熟也没关系，一句话就行。你的视角，正好是我们缺的。",
+    "tag": "开放题",
+    "placeholder": "例如：每周留出 30 分钟让大家互相分享各自领域的进展……"
+  },
+  {
+    "type": "single",
+    "title": "如果这个点子被采纳，你希望怎么「署名」？",
+    "tag": "单选",
+    "options": [
+      "保持匿名",
+      "留下名字",
+      "匿名或署名都可以"
+    ],
+    "hasOther": true,
+    "otherPlaceholder": "我有个特殊的想法……"
+  },
+  {
+    "type": "single",
+    "title": "你还愿意，再留一点建议吗？（可选）",
+    "sub": "下面每个问题都设了「其他」——这正是问卷星做不到的地方：在一道题里既能选、又能填。",
+    "tag": "单选",
+    "options": [
+      "愿意，我补充在下面",
+      "暂时没有了",
+      "我更喜欢直接找 HR 聊"
+    ],
+    "hasOther": true,
+    "otherPlaceholder": "随便说点什么：……"
+  }
+];
+
+let step = 0;
+const answers = QUESTIONS.map(()=>({}));
+
+/* ===== 后端配置：部署后把下面改成你的 Worker 地址 =====
+   例：const API_BASE = "/api";
+   不填（保持空）则为"演示模式"：提交只显示感谢页，不真正保存。 */
+const API_BASE = "/api";
+
+function collectAnswers(){
+  return QUESTIONS.map((q,i)=>{
+    const a=answers[i];
+    if(a.skipped) return {title:q.title, answer:'（跳过）'};
+    let ans='';
+    if(q.type==='single'){
+      if(a.sel==='other') ans='其他：'+(a.otherText||'');
+      else if(a.sel) ans=q.options[+a.sel.slice(3)];
+    }else if(q.type==='multi'){
+      if(a.sel){
+        const parts=[];
+        a.sel.forEach(k=>{ if(k==='other'){ if(a.otherText) parts.push('其他：'+a.otherText); } else parts.push(q.options[+k.slice(3)]); });
+        ans=parts.join('、');
+      }
+    }else if(q.type==='rating'){
+      ans=a.sel!==undefined?String(a.sel):'';
+    }else if(q.type==='open'){
+      ans=a.text||'';
+    }
+    return {title:q.title, answer:ans};
+  });
+}
+
+async function doSubmit(){
+  const answersData=collectAnswers();
+  const btn=document.querySelector('[data-fin]');
+  if(btn){btn.disabled=true;btn.textContent='提交中…';}
+  if(!API_BASE){
+    finish();
+  }else{
+    try{
+      const res=await fetch(API_BASE+'/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({answers:answersData})});
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      finish();
+    }catch(err){
+      alert('提交失败，请检查网络或后端配置。\n'+err.message);
+      if(btn){btn.disabled=false;btn.textContent='完成答题';}
+    }
+  }
+}
+function finish(){
+  document.getElementById('survey').classList.remove('active');
+  document.getElementById('done').classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ===== 管理端 ===== */
+let adminToken='';
+function openAdmin(){
+  document.getElementById('adminModal').classList.add('open');
+  if(adminToken) showAdminPanel();
+}
+function closeAdmin(){ document.getElementById('adminModal').classList.remove('open'); }
+async function adminLogin(){
+  const pw=document.getElementById('adminPw').value;
+  const err=document.getElementById('adminErr');
+  err.textContent='';
+  try{
+    const res=await fetch(API_BASE+'/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pw})});
+    const data=await res.json();
+    if(!data.ok) throw new Error(data.error||'登录失败');
+    adminToken=data.token; showAdminPanel();
+  }catch(e){ err.textContent='登录失败：'+(e.message||''); }
+}
+async function showAdminPanel(){
+  document.getElementById('adminLogin').style.display='none';
+  const panel=document.getElementById('adminPanel'); panel.style.display='block';
+  try{
+    const res=await fetch(API_BASE+'/results?format=json',{headers:{'Authorization':'Bearer '+adminToken}});
+    const data=await res.json();
+    document.getElementById('adminCount').textContent = data.ok? (data.total||0) : '—';
+  }catch(e){}
+}
+async function exportCsv(){
+  const res=await fetch(API_BASE+'/results?format=csv',{headers:{'Authorization':'Bearer '+adminToken}});
+  if(!res.ok){ alert('下载失败，请重新登录'); return; }
+  const blob=await res.blob();
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='问卷结果.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+async function exportJson(){
+  const res=await fetch(API_BASE+'/results?format=json',{headers:{'Authorization':'Bearer '+adminToken}});
+  const data=await res.json();
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='问卷结果.json'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function num(step){return String(step+1).padStart(2,'0');}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+
+function renderQuestion(q){
+  const idx = QUESTIONS.indexOf(q);
+  const a = answers[idx];
+  let inner='';
+  if(q.type==='single' || q.type==='multi'){
+    inner = q.options.map((opt,i)=>{
+      const key = 'opt'+i;
+      const selected = q.type==='single' ? (a.sel===key) : (a.sel&&a.sel.includes(key));
+      return `<div class="opt ${selected?'sel':''}" data-key="${key}">
+        ${q.type==='single'?'<span class="radio"></span>':'<span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span>'}
+        <span class="txt">${esc(opt)}</span>
+        ${q.hasOther&&false?'':''}
+      </div>`;
+    }).join('');
+    if(q.hasOther){
+      const otherKey='other';
+      const otherOn = q.type==='single' ? (a.sel==='other') : (a.sel&&a.sel.includes('other'));
+      inner += `<div class="opt ${otherOn?'sel':''}" data-key="other">
+        ${q.type==='single'?'<span class="radio"></span>':'<span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg></span>'}
+        <span class="txt">其他<span class="other-cue">（可填写）</span></span>
+      </div>`;
+      inner += `<div class="other ${otherOn?'open':''}"><label>在这里补充你的答案：</label><input type="text" data-other placeholder="${esc(q.otherPlaceholder)}" value="${esc(a.otherText||'')}"></div>`;
+    }
+  }
+  if(q.type==='rating'){
+    inner = `<div class="rating">`+q.scale.map(v=>{
+      const sel = a.sel===v;
+      let lab=''; 
+      if(v===q.scale[0]) lab=q.labels.min;
+      else if(v===Math.ceil(q.scale.length/2)) lab=q.labels.mid;
+      else if(v===q.scale[q.scale.length-1]) lab=q.labels.max;
+      return `<div class="r-item"><div class="r-btn ${sel?'sel':''}" data-v="${v}">${v}</div><div class="r-label ${(v===q.scale[q.scale.length-1]||v===q.scale[0])?'hot':''}">${lab}</div></div>`;
+    }).join('')+`</div>`;
+  }
+  if(q.type==='open'){
+    inner = `<textarea data-open placeholder="${esc(q.placeholder)}">${esc(a.text||'')}</textarea>
+      <div class="field-tip">写多少都可以，一句真话胜过十句客套。</div>
+      <div class="count"><span class="cnt">${(a.text||'').length}</span> 字</div>`;
+  }
+  return inner;
+}
+
+function qCard(q){
+  const idx=QUESTIONS.indexOf(q);
+  return `<div class="card" data-q="${q.id}">
+    <div class="q-head">
+      <div class="q-num">${num(idx)}</div>
+      <div style="flex:1">
+        <div class="q-title">${esc(q.title)}<span class="q-tag">${q.tag}</span></div>
+        <div class="q-sub">${esc(q.sub)}</div>
+      </div>
+      <button class="skip" data-skip>跳过此题</button>
+    </div>
+    <div class="q-body">${renderQuestion(q)}</div>
+    <div class="nav">
+      ${idx>0?`<button class="btn prev" data-prev>上一题</button>`:''}
+      ${idx<QUESTIONS.length-1?`<button class="btn next" data-next>下一题</button>`:`<button class="btn fin" data-fin>完成答题</button>`}
+    </div>
+  </div>`;
+}
+
+function showStep(){
+  document.getElementById('qContainer').innerHTML = qCard(QUESTIONS[step]);
+  bindCard();
+  const bar = document.getElementById('barFill');
+  const pct = Math.round(((step+1)/QUESTIONS.length)*100);
+  bar.style.width=pct+'%';
+  document.getElementById('pctTxt').textContent = pct+'%';
+  document.getElementById('doneCnt').textContent = countDone();
+  document.getElementById('totalCnt').textContent = QUESTIONS.length;
+}
+
+function countDone(){
+  return QUESTIONS.filter(q=>{
+    const a=answers[QUESTIONS.indexOf(q)];
+    return a.skipped || a.sel!==undefined || a.text!==undefined || a.openFilled;
+  }).length;
+}
+
+function bindCard(){
+  const card = document.querySelector('#qContainer .card');
+  const q = QUESTIONS[step];
+  const a = answers[step];
+  const updateProgress = ()=>document.getElementById('doneCnt').textContent = countDone();
+
+  card.querySelectorAll('.opt').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const key = el.dataset.key;
+      if(q.type==='single'){
+        a.sel = key;
+        a.text = (key==='other') ? (a.otherText||'') : undefined;
+        renderAll();
+      }else{
+        if(!a.sel) a.sel=[];
+        const i = a.sel.indexOf(key);
+        if(i>=0) a.sel.splice(i,1);
+        else if(key==='other') a.sel.push(key);
+        else{
+          const nonOther = a.sel.filter(k=>k!=='other');
+          if(nonOther.length>=q.max){ flash(); return; }
+          a.sel.push(key);
+        }
+        if(!a.sel.includes('other')) a.otherText=undefined;
+        renderAll();
+      }
+    });
+  });
+  // 其他填写
+  card.querySelectorAll('[data-other]').forEach(inp=>{
+    inp.addEventListener('input',()=>{ a.otherText=inp.value; updateProgress(); });
+  });
+  // 评分
+  card.querySelectorAll('.r-btn').forEach(el=>{
+    el.addEventListener('click',()=>{ a.sel=Number(el.dataset.v); renderAll(); });
+  });
+  // 开放题
+  card.querySelectorAll('[data-open]').forEach(ta=>{
+    ta.addEventListener('input',()=>{ a.text=ta.value; a.openFilled=!!ta.value.trim();
+      const c=card.querySelector('.cnt'); if(c) c.textContent=ta.value.length; updateProgress(); });
+  });
+  // 导航
+  const next=card.querySelector('[data-next]');
+  if(next) next.addEventListener('click',()=>{ if(step<QUESTIONS.length-1){step++;showStep();} });
+  const fin=card.querySelector('[data-fin]');
+  if(fin) fin.addEventListener('click',()=>doSubmit());
+  const prev=card.querySelector('[data-prev]');
+  if(prev) prev.addEventListener('click',()=>{ if(step>0){step--;showStep();} });
+  // 跳过此题
+  const skip=card.querySelector('[data-skip]');
+  if(skip) skip.addEventListener('click',()=>{
+    a.skipped=true;
+    if(step<QUESTIONS.length-1){ step++; showStep(); }
+    else doSubmit();
+  });
+}
+
+function flash(){
+  const btn=document.querySelector('.btn.next,.btn.fin');
+  if(btn){btn.style.animation='none';btn.offsetHeight;btn.style.animation='shake .3s';
+    setTimeout(()=>btn.style.animation='',300);}
+}
+function renderAll(){ 
+  document.getElementById('qContainer').innerHTML=qCard(QUESTIONS[step]); bindCard();
+}
+
+document.getElementById('startBtn').addEventListener('click',()=>{
+  document.querySelector('.hero').style.display='none';
+  document.getElementById('survey').classList.add('active');
+  showStep();
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'){const b=document.querySelector('[data-next],[data-fin]'); if(b) b.click();}
+  if(e.key==='ArrowLeft'){const b=document.querySelector('[data-prev]'); if(b) b.click();}
+});
+
+(function injectShake(){
+  const st=document.createElement('style');
+  st.textContent=`@keyframes shake{25%{transform:translateX(-4px)}50%{transform:translateX(4px)}75%{transform:translateX(-2px)}}`;
+  document.head.appendChild(st);
+})();
+</script>
+</body>
+</html>
